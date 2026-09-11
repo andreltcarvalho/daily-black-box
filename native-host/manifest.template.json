@@ -1,0 +1,9 @@
+{
+  "name": "local.caixapreta.dodia",
+  "description": "Ponte local do Caixa Preta do Dia",
+  "path": "__HOST_PATH__",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://pjmccgpomaddaokgbjfmoidakooahmph/"
+  ]
+}

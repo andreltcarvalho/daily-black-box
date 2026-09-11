@@ -1,0 +1,13 @@
+{
+  "bundle": {
+    "active": true,
+    "resources": {
+      "target/release/caixa-preta-native-host.exe": "native-host/caixa-preta-native-host.exe",
+      "../scripts/register-native-host.ps1": "native-host/register-native-host.ps1",
+      "../scripts/unregister-native-host.ps1": "native-host/unregister-native-host.ps1",
+      "../extension/dist/": "extension/",
+      "../README.md": "README.md"
+    },
+    "windows": { "nsis": { "installerHooks": "installer-hooks.nsh" } }
+  }
+}

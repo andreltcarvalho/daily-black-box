@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Caixa Preta do Dia",
+  "version": "0.1.0",
+  "description": "Registra somente o domínio da aba em foco no aplicativo local.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAutxcDPowzlw8FwiUo/vai6ySe1mIvmbusZirHkHhTG5zsZoShu40qo8nxQnQhJW/kc7FJVvBii0RLHnZYPTzX+bquFpu7lsz+AehfAaXyDFBE21eKp4BxdvZyJzNTBOqI5zSI+psJ8NzjATRuXU5IUKO3Ne+meSlNTcYbzX8KS5sD+cnpKwPd/DbbaN5Eskg5x1EgOpv0syF+BN6eS2BPjvgv2zlijf0XzE/ff2OTOu2mG/mWUSxT5XWSRHFzw/04QtJ63s0loYl3xQHKB9I8kxx8W5mFybs2x6+zR3lrZHWsz+gIDREYZ1zJKXfFTB8b6rFLkiDPTjet2JJW7Qt/QIDAQAB",
+  "minimum_chrome_version": "120",
+  "permissions": [
+    "tabs",
+    "nativeMessaging",
+    "alarms"
+  ],
+  "incognito": "not_allowed",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Caixa Preta do Dia"
+  }
+}

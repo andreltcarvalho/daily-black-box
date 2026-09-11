@@ -1,0 +1,5 @@
+import type { DayReport, Status } from './types';
+export const statusFixture: Status = { settings: { paused: true, configured: true, idle_minutes: 5, vdi: { executable: 'WindowsApp/msrdc.exe', window_class: 'TscShellContainerClass' } }, activity: { source: 'paused', reason: 'manual_pause', hostname: null, app_name: null }, error: null, warning: null, extension_connected: true, vdi_in_focus: false, last_saved_utc: null, data_path: 'C:\\test\\data.sqlite3' };
+export function emptyDay(date: string): DayReport {
+  return { schema_version: 3, date, sessions: [], categories: [{ id: 'vdi', name: 'VDI / trabalho', distraction: false }, { id: 'video', name: 'Vídeo', distraction: false }, { id: 'unknown', name: 'Desconhecido', distraction: false }], domains: [], app_totals: [], category_totals: [], hourly: [], vdi_ms: 0, idle_ms: 0, unknown_ms: 0, unclassified_ms: 0, unidentified_ms: 0, coverage_ms: 0, distraction_ms: null, largest_distraction: null, longest_focus_ms: 0, context_switches: 0 };
+}

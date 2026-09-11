@@ -1,0 +1,1 @@
+{ "identifier": "main", "description": "Somente janela local e diálogos necessários", "windows": ["main"], "permissions": ["core:default", "dialog:allow-save", "autostart:default"] }

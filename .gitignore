@@ -1,0 +1,8 @@
+node_modules/
+dist/
+extension/dist/
+src-tauri/target/
+.cache/
+*.sqlite3
+*.sqlite3-journal
+test-results/

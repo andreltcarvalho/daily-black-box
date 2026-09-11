@@ -1,0 +1,33 @@
+[package]
+name = "caixa-preta-do-dia"
+version = "0.1.0"
+edition = "2021"
+default-run = "caixa-preta-do-dia"
+
+[lib]
+name = "caixa_preta"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-single-instance = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-autostart = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.37", features = ["bundled"] }
+chrono = { version = "0.4", features = ["serde"] }
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_UI_WindowsAndMessaging", "Win32_UI_Accessibility", "Win32_UI_Input_KeyboardAndMouse", "Win32_System_Threading", "Win32_System_ProcessStatus", "Win32_System_SystemInformation", "Win32_System_RemoteDesktop", "Win32_System_Pipes", "Win32_System_IO", "Win32_System_Memory", "Win32_System_LibraryLoader", "Win32_Security", "Win32_Security_Authorization", "Win32_Storage_FileSystem"] }
+
+[features]
+custom-protocol = ["tauri/custom-protocol"]
+
+[[bin]]
+name = "caixa-preta-native-host"
+path = "src/bin/native_host.rs"
+
+[[bin]]
+name = "caixa-preta-do-dia"
+path = "src/main.rs"
