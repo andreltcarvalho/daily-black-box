@@ -1,6 +1,6 @@
 # Validação do MVP Windows
 
-Atualizado em 2026-09-11. Este registro distingue checks automatizados de comportamento real ainda pendente.
+Atualizado em 2026-09-14. Este registro distingue checks automatizados de comportamento real ainda pendente.
 
 ## Executado
 
@@ -19,6 +19,9 @@ Atualizado em 2026-09-11. Este registro distingue checks automatizados de compor
 | NSIS | Pacote gerado na v0.3.2 antecede v0.4.1 e v0.5.0; regeneração do instalador atual permanece pendente |
 | WebView2 real, banco de teste | 6 checks aprovados: IPC/status, dia vazio, início recusado sem VDI, Configurações, Histórico e captura visual |
 | Categorização de aplicativos v0.5.0 | 17 testes Rust e 10 JS aprovados; migração v1→v3, reclassificação histórica e seleção “Entretenimento” para League of Legends cobertas |
+| Linha do tempo v0.6.0 | Suíte Vitest com 13 testes aprovada, incluindo agrupamento visual de interrupção curta e filtro por categoria; typecheck, ESLint e build Vite aprovados |
+| Limites do dia e estados v0.7.0 | 31 testes Vitest aprovados; primeiro/último, lacunas internas, offsets, sessão aberta/duração zero, relógio ajustado, legenda, texto acessível, domínio longo, 500 registros, agrupamento/filtros/totais/exportação preservados. Typecheck, lint e build Vite aprovados com Node 24.19.0; sem mudanças em Rust/contrato/SQLite |
+| Interface web sintética v0.7.0 | Capturas 1280/800 px com estados e domínio longo; 800 px com 500 registros, período único e vazio. Sem overflow horizontal ou erros de página; filtro por teclado e geometria sem sobreposição dos trechos no cenário misto aprovados. Evidência em `.cache/ui/states-v070-result.json`; não substitui WebView2 real |
 | Typecheck, ESLint, build Vite e build release v0.5.0 | Aprovados |
 | Layout 1280 e 800 px | Sem overflow horizontal em dados sintéticos; confirmação das capturas pós-contraste concluída na retomada v0.3.2 |
 | Ponte nativa real | Timeout corrigido; 4 checks reais aprovados com binários debug: handshake/framing, named pipe, pausa e origem inválida. Extensão no Chrome real ainda pendente |
@@ -43,12 +46,27 @@ A sessão v0.3.1 foi interrompida a pedido do usuário; retomada registrada na e
 - [ ] Ativar/desativar autostart e verificar novo login/reinício; restaurar preferência escolhida.
 - [ ] Exportar um dia e ler JSON; excluir um dia/toda atividade com confirmação, sem restaurar dados apagados por mensagens antigas.
 - [ ] Executar instalado offline e verificar escalas Windows 100%, 125% e 150%.
+- [ ] v0.7.0: conferir primeiro/último e lacuna interna num dia conhecido; sessão aberta limitada ao último instante confirmado, incluindo mudanças de relógio/fuso.
+- [ ] v0.7.0: validar padrões/legenda/coluna Estado com teclado, leitor de tela e cores forçadas no WebView2 real, incluindo dia denso e DPI 100/125/150%.
 
 ## Evidência local de desenvolvimento
 
 `.cache/ui/native-result.json`, `.cache/ui/browser-result.json` e screenshots em `.cache/ui/`. O banco `.cache/native-test-data/data.sqlite3` foi reservado aos testes; nenhuma coleta real foi iniciada. Esses artefatos não são distribuídos no aplicativo e não estão versionados.
 
 Não tratar o instalador gerado nem a aprovação de unit tests como aprovação do roteiro real acima.
+
+## Tentativa de validação manual real v0.7.0 — 2026-09-14
+
+| Cenário | Resultado real | Evidência / bloqueio |
+| --- | --- | --- |
+| Abrir a build Windows com WebView2 | Bloqueado | `src-tauri/target/release/caixa-preta-do-dia.exe` foi iniciado e permaneceu como processo Windows (`caixa-preta-do-dia.exe`, PID 17236; arquivo com 11.301.376 bytes, última gravação em 2026-09-11 17:29:41). O controlador de UI retornou `apps: []`, sem janela nativa observável; não foi possível inspecionar o WebView2. |
+| Timeline com dia denso e sessão aberta | Não validado | Sem árvore de acessibilidade ou captura da janela, não foi possível confirmar a renderização, o limite no último instante confirmado ou a ausência de estimativa até o relógio atual. |
+| Teclado | Não validado | Não foi possível enviar navegação ao WebView2 nem observar foco/ordem/ativação. |
+| Leitor de tela | Não validado | Nenhuma árvore de acessibilidade da janela foi exposta pelo controlador; não há evidência de leitura real. |
+| Cores forçadas | Não validado | Não foi possível aplicar/observar o modo de cores forçadas no WebView2. |
+| DPI 100%, 125% e 150% | Não validado | Não foi possível operar a janela nem alternar/observar as três escalas com inspeção visual real. |
+
+Conclusão desta tentativa: somente a inicialização do processo foi observada. Nenhum dos seis cenários acima deve ser marcado como aprovado. Permanecem bloqueados a captura/controle da janela nativa pelo ambiente de automação e, por consequência, a evidência real de WebView2, leitor de tela, cores forçadas e DPI. Os testes automatizados e a interface web sintética continuam sendo evidências separadas e não substituem este roteiro.
 
 ## Retomada v0.3.2
 

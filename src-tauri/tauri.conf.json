@@ -3,7 +3,7 @@
   "productName": "Caixa Preta do Dia", "version": "0.1.0", "identifier": "local.caixapreta.dodia",
   "build": { "beforeDevCommand": "npm run dev", "devUrl": "http://127.0.0.1:1420", "beforeBuildCommand": "npm run build", "frontendDist": "../dist" },
   "app": {
-    "windows": [{ "title": "Caixa Preta do Dia", "width": 1280, "height": 850, "minWidth": 760, "minHeight": 600 }],
+    "windows": [{ "title": "Caixa Preta do Dia", "width": 1280, "height": 850, "minWidth": 760, "minHeight": 600, "decorations": false, "shadow": true }],
     "security": { "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src ipc: http://ipc.localhost; object-src 'none'; frame-src 'none'" }
   },
   "bundle": { "active": false, "targets": ["nsis"], "icon": ["icons/icon.ico"], "windows": { "nsis": { "installMode": "currentUser" } } }

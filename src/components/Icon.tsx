@@ -1,5 +1,9 @@
 export function Icon({ name, size = 20 }: { name: string; size?: number }) {
   const paths: Record<string, React.ReactNode> = {
+    minimize: <path d="M5 12h14"/>,
+    maximize: <rect x="5" y="5" width="14" height="14" rx="1"/>,
+    restore: <><path d="M9 5V3h12v12h-2"/><rect x="3" y="9" width="12" height="12" rx="1"/></>,
+    close: <path d="m6 6 12 12M18 6 6 18"/>,
     day: <><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4m8-4v4m-9 8h4m-4 3h7"/></>,
     history: <><path d="M3 11a9 9 0 1 1 2 7M3 4v7h7"/><path d="M12 7v5l3 2"/></>,
     settings: <><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></>,

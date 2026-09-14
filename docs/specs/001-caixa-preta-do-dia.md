@@ -1,8 +1,47 @@
 # Caixa Preta do Dia — especificação e plano de implementação
 
-Status: **identificação e categorização de aplicativos locais implementadas e validadas automaticamente; correção do travamento aplicada; validações reais do MVP ainda pendentes**.
-Versão: **0.5.0**. Data: **2026-09-11**.
+Status: **limites dos períodos do dia, maior lacuna interna e faixa visual de estados implementados, preservando agrupamento e filtros; validações reais do MVP ainda pendentes**.
+Versão: **0.7.0**. Data: **2026-09-11**.
 Workspace: `C:\Users\Usuario\Documents\ChatGPT\My-Apps`.
+
+## Incremento v0.7.0 — primeiro/último período e estados da linha do tempo
+
+Escopo implementado: somente os itens 7 e 8 autorizados. Um resumo integrado à linha do tempo apresenta início do primeiro período, fim confirmado do último e horário/duração da maior lacuna interna. Uma faixa compacta abaixo das categorias distingue VDI, navegador, aplicativo local, sistema, inatividade, pausa, desconhecido e não observado com padrões/bordas e legenda textual. A lista bruta inclui a coluna Estado; cada trecho da faixa possui nome acessível com origem, horários e duração.
+
+Regras da derivação:
+
+- Usar `report.sessions` na ordem observada entregue pelo Rust (`ORDER BY id`), sem ordenar pelo relógio civil nem usar blocos agrupados. Resumo independente dos filtros; incluir limites de registros recém-abertos com duração zero.
+- Primeiro início e último fim usam `start_utc` e `end_utc`, com o `offset_seconds` do respectivo registro. Sessão aberta mostra “Em andamento · último instante confirmado”, sem consultar o relógio atual ou estimar duração.
+- Lacuna é a diferença positiva entre o fim de um registro bruto e o início do seguinte. Cada extremidade usa seu próprio offset. Em empate, manter a primeira maior lacuna. Não considerar o tempo anterior ao primeiro registro nem posterior ao último; transições marcadas `clock_adjusted` não são evidência de lacuna. Pausa e `unobserved` já registrados têm estados próprios e não criam uma segunda lacuna sobre a mesma duração.
+- Dia vazio mostra “Não disponível”; um registro mostra primeiro/último e “Sem lacuna interna”. Se ainda não houver duração confirmada, manter o resumo e explicar essa condição na área vazia.
+- A faixa de estados representa as mesmas sessões uma única vez, com largura proporcional, sem largura mínima que estenda períodos curtos. As lacunas derivadas só aparecem em “Tudo”; filtrar não transforma registros ocultos em ausência de coleta. O agrupamento visual da v0.6.0 e o filtro da lista permanecem preservados.
+- Sem mudanças em coleta, categorias, totais, gráficos, exportação, comandos Rust, contrato de relatório ou SQLite. Sem novas dependências, migração ou instalador.
+
+Arquivos alterados neste incremento: `src/timeline.ts`, `src/timeline.test.ts`, `src/components/Dashboard.tsx`, `src/components/Dashboard.test.tsx`, `src/styles.css`, esta especificação e `docs/validation/windows-mvp.md`. `src/types.ts`, `src/App.tsx` e relatórios/gravador Rust foram inspecionados e não precisaram mudar. Alterações locais preexistentes da v0.6.0 foram preservadas.
+
+Validação executada em 2026-09-11, com Node 24.19.0:
+
+| Comando/check | Resultado |
+| --- | --- |
+| `npm test -- --run` | 31 testes aprovados em 4 arquivos; 18 casos acrescentados neste incremento |
+| `npm run typecheck` | Aprovado para frontend e extensão |
+| `npm run lint` | Aprovado |
+| `npm run build` | Aprovado; Vite 7.3.6, 37 módulos |
+| Interface web com dados sintéticos | 1280/800 px com oito estados, lacuna, domínio longo e aplicativo local; 800 px com 500 registros, um período e dia vazio. Sem overflow horizontal nem erros de página; filtro acionado por teclado; trechos de estados sem sobreposição nos cenários mistos |
+
+Testes cobrem primeiro/último em vários registros, vazio, um registro, ausência de lacuna em consecutivos, maior lacuna em três períodos, offsets distintos, sessão aberta e duração zero, lacuna preservada apesar de agrupamento, ajustes de relógio, estados/legenda/texto acessível, domínio longo, dia denso, filtro, totais e callback de exportação preservados, sem mutação do relatório. O eixo termina no limite confirmado mesmo quando o último registro ainda tem duração zero.
+
+Evidência visual local: `.cache/states-ui.mjs`, `.cache/ui/states-v070-result.json` e `.cache/ui/states-v070-*.png`; capturas de cenários mistos/denso conferidas. Artefatos sintéticos de desenvolvimento, sem dados de atividade real. A primeira tentativa de testes encontrou restrições de leitura do sandbox/Node 20; os comandos finais passaram fora do sandbox com Node 24. A primeira navegação sintética excedeu a espera por `load`; a execução posterior aguardou `domcontentloaded` e concluiu todos os cenários.
+
+Pendências manuais: conferir leitura dos padrões, leitor de tela, cores forçadas, teclado e DPI 100/125/150% no WebView2 real, com dia conhecido, sessão aberta e ajustes de relógio/fuso. Em 2026-09-14, a build release foi iniciada como processo Windows, mas o controlador de UI retornou `apps: []` e não expôs a janela nativa; portanto nenhum desses cenários foi validado. Nenhum ensaio final de coleta no Windows foi executado. Cargo não foi reexecutado, pois Rust e o contrato não mudaram. Instalador não foi gerado; demais aceites reais continuam pendentes em `docs/validation/windows-mvp.md`.
+
+## Incremento v0.6.0 — leitura da linha do tempo
+
+Escopo aprovado: reduzir o ruído visual da linha do tempo e permitir filtrar as faixas por categoria.
+
+Implementação: sessões SQLite continuam íntegras e a lista mantém cada registro bruto. Somente a visualização agrupa uma interrupção de até cinco segundos de Sistema ou Desconhecido quando ela estiver entre duas faixas da mesma categoria, sem lacuna superior a um segundo. A faixa agrupada informa essa condição no detalhe. Os filtros “Tudo” e por categoria atuam na linha do tempo e na lista de registros brutos filtrada, sem alterar totais, cartões, gráficos ou exportação.
+
+Validação: suíte Vitest com 13 testes aprovada, incluindo agrupamento permitido, preservação quando as categorias diferem, edição de categoria, equivalentes textuais e filtro. Typecheck, ESLint e build Vite aprovados. A inspeção manual de um dia denso continua pendente em AC18.
 
 ## Incremento v0.4.0 — aplicativos locais em foco
 
@@ -372,7 +411,7 @@ Quatro cards principais, demais métricas em faixa compacta. Evitar sete cards e
 - Cantos moderadamente arredondados e sombras leves somente onde distinguem camadas.
 - Categorias usam poucas cores estáveis, texto/legenda e padrões para lacunas; desconhecido em cinza e inatividade em tom discreto. Não usar vermelho/verde para julgar a pessoa.
 - Layout principal para desktop; abaixo de aproximadamente 1100 px empilhar gráficos e reduzir navegação. Em largura estreita, linha do tempo pode rolar, mantendo alternativa textual acessível.
-- Não exibir um segmento como zero apenas porque é estreito: permitir seleção por lista de intervalos e detalhe por teclado. Período futuro permanece vazio; período anterior ao início de coleta aparece como “sem coleta”.
+- Não exibir um segmento como zero apenas porque é estreito: permitir seleção por lista de intervalos e detalhe por teclado. Tempo anterior ao primeiro registro e posterior ao último permanece fora das lacunas, pois não há evidência de que a coleta deveria estar ativa.
 - Componentes simples em HTML/CSS e SVG para linha do tempo/barras; sem biblioteca de gráficos inicialmente. Se os requisitos acessíveis não puderem ser atendidos de forma pequena, justificar uma dependência no plano antes de adotá-la.
 
 ### Estados de interface
@@ -542,3 +581,6 @@ Manter entradas em ordem cronológica. Toda alteração futura neste arquivo dev
 | 2026-09-10 | 0.4.0 | RF12, D10 e AC19: identificação e relatório de aplicativos locais em foco | Usuário solicitou distinguir atividades fora da VDI, como League of Legends e ChatGPT, preservando privacidade | 17 testes Rust, 10 JS, fmt, Clippy, typecheck, lint e build web aprovados; ensaio real AC19 no Windows pendente |
 | 2026-09-10 | 0.4.1 | Correção de travamento ao abrir e em ações da bandeja | Event Log registrou Application Hang; chamadas Tauri da bandeja ocorriam com mutex do runtime retido, permitindo espera circular com IPC | Testes, Clippy e build posteriores aprovados; abertura/fechamento repetidos no Windows ainda pendentes |
 | 2026-09-11 | 0.5.0 | RF12 e AC20: categorização local de aplicativos | Usuário solicitou categorizar aplicativos locais, como League of Legends e WhatsApp, pelas mesmas categorias usadas em sites; adiciona mapa local aplicativo→categoria e reclassificação histórica | 17 testes Rust, 10 JS, fmt, Clippy, typecheck, lint, build Vite e build release aprovados; ensaio real AC19/AC20 no Windows pendente |
+| 2026-09-11 | 0.6.0 | RF05–06 e AC18: agrupamento visual e filtros da linha do tempo | Usuário solicitou reduzir a fragmentação visual e filtrar por categoria; registros persistidos e cálculos permanecem inalterados | Suíte Vitest com 13 testes, typecheck, ESLint e build Vite aprovados; inspeção manual de dia denso pendente |
+| 2026-09-11 | 0.7.0 | RF05–06/AC18: primeiro início, último fim confirmado, maior lacuna interna e faixa de estados; arquivos e regras detalhados no incremento acima | Somente itens 7 e 8; derivação do relatório bruto sem migração, mudanças de coleta ou novos totais; preserva agrupamento, filtros e exportação | 31 testes, typecheck, lint e build aprovados com Node 24; cenários web sintéticos em 1280/800 px aprovados. Leitor de tela, cores forçadas, DPI e ensaio WebView2/Windows reais pendentes; sem instalador |
+| 2026-09-14 | 0.7.1 | Tentativa restrita de validação manual real v0.7.0 | A build release iniciou como processo, mas o controlador de UI não expôs janela nativa; nenhuma regra de coleta ou feature foi alterada | Processo observado; timeline densa/sessão aberta, teclado, leitor de tela, cores forçadas e DPI 100/125/150% continuam não validados e bloqueados. Evidência detalhada em `docs/validation/windows-mvp.md` |
